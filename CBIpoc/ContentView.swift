@@ -2,6 +2,7 @@ import SwiftUI
 import PhotosUI
 import FirebaseStorage
 import FirebaseFirestore
+import Foundation
 
 let db = Firestore.firestore()
 
@@ -121,7 +122,28 @@ func uploadImage(_ image: UIImage) {
             
             // Use the downloadURL for further processing
             print("Download URL: \(downloadURL)")
+            let currentDate = Date()
             
+            // Create a DateFormatter instance
+            let dateFormatter = DateFormatter()
+            
+            // Set the date format
+            dateFormatter.dateFormat = "dd MMM yyyy HH:mm:ss"
+            
+            // Format the current date using the date formatter
+            let formattedDateTime = dateFormatter.string(from: currentDate)
+            
+            db.collection("images").addDocument(data: [
+                "added_time": formattedDateTime,
+                "name": filename,
+                "url": "\(downloadURL)"
+            ]){ err in
+                if let err = err {
+                    print("Error writing document: \(err)")
+                } else {
+                    print("Document successfully written!")
+                }
+            }
             
         }
         // Get the download URL of the uploaded image
