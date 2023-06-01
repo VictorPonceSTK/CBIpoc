@@ -133,8 +133,8 @@ func uploadImage(_ image: UIImage) {
             // Format the current date using the date formatter
             let formattedDateTime = dateFormatter.string(from: currentDate)
             
-            db.collection("images").addDocument(data: [
-                "added_time": formattedDateTime,
+            db.collection("images").document().setData([
+                "added_time": Int(NSDate().timeIntervalSince1970),
                 "name": filename,
                 "url": "\(downloadURL)"
             ]){ err in
