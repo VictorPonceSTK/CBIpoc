@@ -25,7 +25,14 @@ struct CBIpocApp: App {
         
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LoginView()
         }
     }
 }
+
+//
+//struct ContentView_Previews: PreviewProvider{
+//    static var previews: some view{
+//        CBIpocApp()
+//    }
+//}
