@@ -122,7 +122,6 @@ func uploadImage(_ image: UIImage, completion: @escaping (Bool, String) -> Void)
         }
         
         // Image uploaded successfully
-        
         storageRef.downloadURL { (url, error) in
             if let error = error {
                 print("Error retrieving download URL: \(error.localizedDescription)")
@@ -134,6 +133,7 @@ func uploadImage(_ image: UIImage, completion: @escaping (Bool, String) -> Void)
                 return completion(true,"Download URL is nil!")
             }
             print("Image uploaded sucessfully with url: \(url)")
+//            return completion(true,"Image uploaded successfully!")
             uploadDoc(url: downloadURL, filename: filename) { success, message in
                 return completion(success, message)
             }
