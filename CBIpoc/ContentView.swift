@@ -10,7 +10,9 @@ struct ContentView: View {
     @State private var isPhotoLibraryOpen = false
     @State private var selectedImage: UIImage?
     @State private var isCompleted = false
-    
+    @State private var messageStatus = ""
+//    @EnvironmentObject private var completionStatus: UploadStatus = UploadStatus()
+
     var body: some View {
         VStack(spacing: 50) {
             Button("Open Camera") {
@@ -25,8 +27,9 @@ struct ContentView: View {
             .sheet(isPresented: $isCameraOpen) {
                 ImagePicker(sourceType: .camera) { image in
                     selectedImage = image
-                    uploadImage(image){ success in
+                    uploadImage(image){ success, message in
                         isCompleted = success
+                        messageStatus = message
                     }
                 }
             }
@@ -37,8 +40,9 @@ struct ContentView: View {
             .sheet(isPresented: $isPhotoLibraryOpen) {
                 ImagePicker(sourceType: .photoLibrary) { image in
                     selectedImage = image
-                    uploadImage(image){ success in
+                    uploadImage(image){ success, message in
                         isCompleted = success
+                        messageStatus = message
                     }
                 }
             }
@@ -98,7 +102,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
 }
 
-func uploadImage(_ image: UIImage, completion: @escaping(Bool)-> Void) {
+func uploadImage(_ image: UIImage, completion: @escaping (Bool, String) -> Void) {
     // Convert the UIImage to Data
     guard let imageData = image.jpegData(compressionQuality: 0.8) else {
         print("Failed to convert image to Data.")
@@ -113,30 +117,31 @@ func uploadImage(_ image: UIImage, completion: @escaping(Bool)-> Void) {
     let uploadTask = storageRef.putData(imageData, metadata: nil) { (metadata, error) in
         if let error = error {
             print("Error uploading image: \(error.localizedDescription)")
-            return
+            
+            return completion(false, "Error uploading image: \(error.localizedDescription)")
         }
         
         // Image uploaded successfully
-        print("Image uploaded.")
+        
         storageRef.downloadURL { (url, error) in
             if let error = error {
                 print("Error retrieving download URL: \(error.localizedDescription)")
-                return completion(false)
+                return completion(true, "Error retrieving download URL: \(error.localizedDescription)")
             }
             
             guard let downloadURL = url else {
                 print("Download URL is nil.")
-                return completion(false)
+                return completion(true,"Download URL is nil!")
             }
-            uploadDoc(url: downloadURL, filename: filename) { success in
-                return completion(true)
+            print("Image uploaded sucessfully with url: \(url)")
+            uploadDoc(url: downloadURL, filename: filename) { success, message in
+                return completion(success, message)
             }
         }
     }
 }
 
-func uploadDoc(url: URL, filename: String, completion: @escaping (Bool) -> Void) {
-
+func uploadDoc(url: URL, filename: String, completion: @escaping (Bool, String) -> Void) {
     db.collection("images").document().setData([
         "added_time": Int(NSDate().timeIntervalSince1970),
         "name": filename,
@@ -144,8 +149,10 @@ func uploadDoc(url: URL, filename: String, completion: @escaping (Bool) -> Void)
     ]) { err in
         if let err = err {
             print("Error writing document: \(err)")
+            completion(false, "Failed to upload document: \(err.localizedDescription)")
         } else {
             print("Document successfully written!")
+            completion(true, "Document uploaded successfully")
         }
     }
-    return completion(true)}
+}
