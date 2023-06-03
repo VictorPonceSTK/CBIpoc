@@ -2,7 +2,6 @@ import SwiftUI
 import PhotosUI
 import FirebaseStorage
 import FirebaseFirestore
-import Foundation
 
 let db = Firestore.firestore()
 
@@ -10,6 +9,7 @@ struct ContentView: View {
     @State private var isCameraOpen = false
     @State private var isPhotoLibraryOpen = false
     @State private var selectedImage: UIImage?
+    @State private var isCompleted = false
     
     var body: some View {
         VStack(spacing: 50) {
@@ -25,7 +25,9 @@ struct ContentView: View {
             .sheet(isPresented: $isCameraOpen) {
                 ImagePicker(sourceType: .camera) { image in
                     selectedImage = image
-                    uploadImage(image)
+                    uploadImage(image){ success in
+                        isCompleted = success
+                    }
                 }
             }
             
@@ -35,11 +37,20 @@ struct ContentView: View {
             .sheet(isPresented: $isPhotoLibraryOpen) {
                 ImagePicker(sourceType: .photoLibrary) { image in
                     selectedImage = image
-                    uploadImage(image)
+                    uploadImage(image){ success in
+                        isCompleted = success
+                    }
                 }
             }
         }
         .padding()
+        .alert(isPresented: $isCompleted) {
+            Alert(
+                title: Text("Status message"),
+                message: Text("Image has been uploaded sucessfully"),
+                dismissButton: .default(Text("Close"))
+            )
+        }
     }
 }
 
@@ -87,7 +98,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
 }
 
-func uploadImage(_ image: UIImage) {
+func uploadImage(_ image: UIImage, completion: @escaping(Bool)-> Void) {
     // Convert the UIImage to Data
     guard let imageData = image.jpegData(compressionQuality: 0.8) else {
         print("Failed to convert image to Data.")
@@ -96,10 +107,8 @@ func uploadImage(_ image: UIImage) {
     
     // Generate a unique filename for the image
     let filename = UUID().uuidString + ".jpg"
-    
     // Create a reference to the Firebase Storage location where the image will be uploaded
-    let storageRef = Storage.storage().reference().child("\(filename)")
-    
+    let storageRef = Storage.storage().reference().child(filename)
     // Upload the image data to Firebase Storage
     let uploadTask = storageRef.putData(imageData, metadata: nil) { (metadata, error) in
         if let error = error {
@@ -112,41 +121,31 @@ func uploadImage(_ image: UIImage) {
         storageRef.downloadURL { (url, error) in
             if let error = error {
                 print("Error retrieving download URL: \(error.localizedDescription)")
-                return
+                return completion(false)
             }
             
             guard let downloadURL = url else {
                 print("Download URL is nil.")
-                return
+                return completion(false)
             }
-            
-            // Use the downloadURL for further processing
-            print("Download URL: \(downloadURL)")
-            let currentDate = Date()
-            
-            // Create a DateFormatter instance
-            let dateFormatter = DateFormatter()
-            
-            // Set the date format
-            dateFormatter.dateFormat = "dd MMM yyyy HH:mm:ss"
-            
-            // Format the current date using the date formatter
-            let formattedDateTime = dateFormatter.string(from: currentDate)
-            
-            db.collection("images").document().setData([
-                "added_time": Int(NSDate().timeIntervalSince1970),
-                "name": filename,
-                "url": "\(downloadURL)"
-            ]){ err in
-                if let err = err {
-                    print("Error writing document: \(err)")
-                } else {
-                    print("Document successfully written!")
-                }
+            uploadDoc(url: downloadURL, filename: filename) { success in
+                return completion(true)
             }
-            
         }
-        // Get the download URL of the uploaded image
-        
     }
 }
+
+func uploadDoc(url: URL, filename: String, completion: @escaping (Bool) -> Void) {
+
+    db.collection("images").document().setData([
+        "added_time": Int(NSDate().timeIntervalSince1970),
+        "name": filename,
+        "url": "\(url)"
+    ]) { err in
+        if let err = err {
+            print("Error writing document: \(err)")
+        } else {
+            print("Document successfully written!")
+        }
+    }
+    return completion(true)}
