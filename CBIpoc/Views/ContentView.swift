@@ -2,7 +2,7 @@ import SwiftUI
 import PhotosUI
 import FirebaseStorage
 import FirebaseFirestore
-
+import FirebaseCore
 let db = Firestore.firestore()
 
 struct ContentView: View {
@@ -11,6 +11,7 @@ struct ContentView: View {
     @State private var selectedImage: UIImage?
     @State private var isCompleted = false
     @State private var messageStatus = ""
+    var userUID = ""
 //    @EnvironmentObject private var completionStatus: UploadStatus = UploadStatus()
 
     var body: some View {
@@ -27,7 +28,7 @@ struct ContentView: View {
             .sheet(isPresented: $isCameraOpen) {
                 ImagePicker(sourceType: .camera) { image in
                     selectedImage = image
-                    uploadImage(image){ success, message in
+                    uploadImage(image,userUID){ success, message in
                         isCompleted = success
                         messageStatus = message
                     }
@@ -40,7 +41,7 @@ struct ContentView: View {
             .sheet(isPresented: $isPhotoLibraryOpen) {
                 ImagePicker(sourceType: .photoLibrary) { image in
                     selectedImage = image
-                    uploadImage(image){ success, message in
+                    uploadImage(image, userUID){ success, message in
                         isCompleted = success
                         messageStatus = message
                     }
@@ -57,12 +58,6 @@ struct ContentView: View {
         }
     }
 }
-
-//struct ContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ContentView()
-//    }
-//}
 
 struct ImagePicker: UIViewControllerRepresentable {
     var sourceType: UIImagePickerController.SourceType
@@ -102,7 +97,7 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
 }
 
-func uploadImage(_ image: UIImage, completion: @escaping (Bool, String) -> Void) {
+func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Bool, String) -> Void) {
     // Convert the UIImage to Data
     guard let imageData = image.jpegData(compressionQuality: 0.8) else {
         print("Failed to convert image to Data.")
@@ -134,15 +129,15 @@ func uploadImage(_ image: UIImage, completion: @escaping (Bool, String) -> Void)
             }
             print("Image uploaded sucessfully with url: \(url)")
 //            return completion(true,"Image uploaded successfully!")
-            uploadDoc(url: downloadURL, filename: filename) { success, message in
+            uploadDoc(url: downloadURL, filename: filename, userUID: userUID) { success, message in
                 return completion(success, message)
             }
         }
     }
 }
 
-func uploadDoc(url: URL, filename: String, completion: @escaping (Bool, String) -> Void) {
-    db.collection("images").document().setData([
+func uploadDoc(url: URL, filename: String,userUID: String,completion: @escaping (Bool, String) -> Void) {
+    db.collection("users").document(userUID).collection("images").document().setData([
         "added_time": Int(NSDate().timeIntervalSince1970),
         "name": filename,
         "url": "\(url)"
