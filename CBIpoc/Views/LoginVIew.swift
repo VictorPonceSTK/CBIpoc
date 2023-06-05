@@ -18,9 +18,11 @@ struct LoginView: View {
         } else {
             VStack(spacing:100) {
                 VStack {
+                    Image("cblogo")
+                        .padding(.top,10)
                     Text("Welcome")
                         .font(.largeTitle)
-                        .padding(.top,150)
+                        .padding(.top,10)
                     
                     TextField("Email",text: $email)
                         .foregroundColor(colorScheme == .dark ? .white : .black)
@@ -39,6 +41,7 @@ struct LoginView: View {
                     Rectangle()
                         .frame(width:350,height:1)
                         .foregroundColor(.blue)
+                    
                 }
                 
                 Button(action: {
@@ -63,6 +66,7 @@ struct LoginView: View {
                 .padding(.horizontal, 50)
                 
                 Spacer()
+                
             }
         }
     }

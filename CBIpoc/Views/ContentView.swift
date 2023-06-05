@@ -12,47 +12,72 @@ struct ContentView: View {
     @State private var isCompleted = false
     @State private var messageStatus = ""
     var userUID = ""
-//    @EnvironmentObject private var completionStatus: UploadStatus = UploadStatus()
-
+    
     var body: some View {
         VStack(spacing: 50) {
-            Button("Open Camera") {
-                if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                    AVCaptureDevice.requestAccess(for: .video) { granted in
-                        if granted {
-                            isCameraOpen = true
+            Spacer()
+            
+            VStack {
+                Button(action: {
+                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                        AVCaptureDevice.requestAccess(for: .video) { granted in
+                            if granted {
+                                isCameraOpen = true
+                            }
+                        }
+                    }
+                }) {
+                    Image(systemName: "camera")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(.top, 60)
+                        .padding(.bottom, 60)
+                }
+                .sheet(isPresented: $isCameraOpen) {
+                    ImagePicker(sourceType: .camera) { image in
+                        selectedImage = image
+                        uploadImage(image, userUID) { success, message in
+                            isCompleted = success
+                            messageStatus = message
                         }
                     }
                 }
-            }
-            .sheet(isPresented: $isCameraOpen) {
-                ImagePicker(sourceType: .camera) { image in
-                    selectedImage = image
-                    uploadImage(image,userUID){ success, message in
-                        isCompleted = success
-                        messageStatus = message
-                    }
-                }
+                
+                Text("Camera")
+                    .font(.headline)
             }
             
-            Button("Open Library") {
-                isPhotoLibraryOpen = true
-            }
-            .sheet(isPresented: $isPhotoLibraryOpen) {
-                ImagePicker(sourceType: .photoLibrary) { image in
-                    selectedImage = image
-                    uploadImage(image, userUID){ success, message in
-                        isCompleted = success
-                        messageStatus = message
+            VStack {
+                Button(action: {
+                    isPhotoLibraryOpen = true
+                }) {
+                    Image(systemName: "photo.stack")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(.top, 60)
+                        .padding(.bottom, 60)
+                }
+                .sheet(isPresented: $isPhotoLibraryOpen) {
+                    ImagePicker(sourceType: .photoLibrary) { image in
+                        selectedImage = image
+                        uploadImage(image, userUID) { success, message in
+                            isCompleted = success
+                            messageStatus = message
+                        }
                     }
                 }
+                
+                Text("Photo Library")
+                    .font(.headline)
             }
+            
+            Spacer()
         }
         .padding()
         .alert(isPresented: $isCompleted) {
             Alert(
                 title: Text("Status message"),
-                message: Text("Image has been uploaded sucessfully"),
+                message: Text("Image has been uploaded successfully"),
                 dismissButton: .default(Text("Close"))
             )
         }
@@ -127,8 +152,7 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
                 print("Download URL is nil.")
                 return completion(true,"Download URL is nil!")
             }
-            print("Image uploaded sucessfully with url: \(url)")
-//            return completion(true,"Image uploaded successfully!")
+            print("Image uploaded successfully with url: \(url)")
             uploadDoc(url: downloadURL, filename: filename, userUID: userUID) { success, message in
                 return completion(success, message)
             }
@@ -136,7 +160,7 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
     }
 }
 
-func uploadDoc(url: URL, filename: String,userUID: String,completion: @escaping (Bool, String) -> Void) {
+func uploadDoc(url: URL, filename: String, userUID: String, completion: @escaping (Bool, String) -> Void) {
     db.collection("users").document(userUID).collection("images").document().setData([
         "added_time": Int(NSDate().timeIntervalSince1970),
         "name": filename,
