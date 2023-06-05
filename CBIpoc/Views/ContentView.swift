@@ -30,8 +30,9 @@ struct ContentView: View {
                     Image(systemName: "camera")
                         .resizable()
                         .scaledToFit()
-                        .padding(.top, 60)
-                        .padding(.bottom, 60)
+                        .frame(width: 100, height: 100)
+                        .padding(.top, 25)
+                        .padding(.bottom, 25)
                 }
                 .sheet(isPresented: $isCameraOpen) {
                     ImagePicker(sourceType: .camera) { image in
@@ -43,7 +44,7 @@ struct ContentView: View {
                     }
                 }
                 
-                Text("Camera")
+                Text("From Camera")
                     .font(.headline)
             }
             
@@ -54,8 +55,9 @@ struct ContentView: View {
                     Image(systemName: "photo.stack")
                         .resizable()
                         .scaledToFit()
-                        .padding(.top, 60)
-                        .padding(.bottom, 60)
+                        .frame(width: 100, height: 100)
+                        .padding(.top, 25)
+                        .padding(.bottom, 25)
                 }
                 .sheet(isPresented: $isPhotoLibraryOpen) {
                     ImagePicker(sourceType: .photoLibrary) { image in
@@ -67,7 +69,7 @@ struct ContentView: View {
                     }
                 }
                 
-                Text("Photo Library")
+                Text("From Library")
                     .font(.headline)
             }
             
