@@ -164,7 +164,7 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
 
 func uploadDoc(url: URL, filename: String, userUID: String, completion: @escaping (Bool, String) -> Void) {
     db.collection("users").document(userUID).collection("images").document().setData([
-        "added_time": Int(NSDate().timeIntervalSince1970),
+        "added_time": FieldValue.serverTimestamp(),
         "name": filename,
         "url": "\(url)"
     ]) { err in
