@@ -18,7 +18,7 @@ struct LoginView: View {
         } else {
             VStack(spacing:100) {
                 VStack {
-                    Image("cblogo")
+                    Image("innovationLogo")
                         .padding(.top,10)
                     Text("Welcome")
                         .font(.largeTitle)

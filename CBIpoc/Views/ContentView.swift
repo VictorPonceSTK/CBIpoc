@@ -157,26 +157,42 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
             print("Image uploaded successfully with url: \(String(describing: url))").self
             let hash = image.blurHash(numberOfComponents: (3,5))
             print("Image Hash is \(hash)")
-            uploadDoc(url: downloadURL, filename: filename, userUID: userUID, hash: hash!) { success, message in
+            
+            uploadDoc(url: downloadURL, filename: filename, userUID: userUID, hash: hash!,downloadURL: downloadURL) { success, message in
                 return completion(success, message)
             }
         }
     }
 }
 
-func uploadDoc(url: URL, filename: String, userUID: String,hash: String, completion: @escaping (Bool, String) -> Void) {
-    db.collection("users").document(userUID).collection("images").document().setData([
+func uploadDoc(url: URL, filename: String, userUID: String,hash: String, downloadURL:URL, completion: @escaping (Bool, String) -> Void) {
+    let body = [
         "added_time": FieldValue.serverTimestamp(),
         "name": filename,
         "url": "\(url)",
         "hash": hash
-    ]) { err in
+    ] as [String : Any]
+    
+    
+    print("debug body: \(body)")
+    let ref = db.collection("users").document(userUID).collection("images").document()
+    db.collection("users").document(userUID).collection("images").document(ref.documentID).setData(body) {  err in
         if let err = err {
             print("Error writing document: \(err)")
             completion(false, "Failed to upload document: \(err.localizedDescription)")
         } else {
-            print("Document successfully written!")
+            let apiBody = [
+                "url":"\(url)",
+                "user_id": userUID,
+                "document_id": ref.documentID
+            ] as [String: Any]
+            print("sending to api", apiBody)
             completion(true, "Document uploaded successfully")
+            sendToAnalyse(inUrl:downloadURL, body:apiBody)
+            sendToPredict(inUrl:downloadURL, body:apiBody)
+            print("Document successfully written!")
+            
+            
         }
     }
 }
