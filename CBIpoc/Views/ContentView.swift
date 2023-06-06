@@ -154,19 +154,22 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
                 print("Download URL is nil.")
                 return completion(true,"Download URL is nil!")
             }
-            print("Image uploaded successfully with url: \(url)")
-            uploadDoc(url: downloadURL, filename: filename, userUID: userUID) { success, message in
+            print("Image uploaded successfully with url: \(String(describing: url))").self
+            let hash = image.blurHash(numberOfComponents: (3,5))
+            print("Image Hash is \(hash)")
+            uploadDoc(url: downloadURL, filename: filename, userUID: userUID, hash: hash!) { success, message in
                 return completion(success, message)
             }
         }
     }
 }
 
-func uploadDoc(url: URL, filename: String, userUID: String, completion: @escaping (Bool, String) -> Void) {
+func uploadDoc(url: URL, filename: String, userUID: String,hash: String, completion: @escaping (Bool, String) -> Void) {
     db.collection("users").document(userUID).collection("images").document().setData([
         "added_time": FieldValue.serverTimestamp(),
         "name": filename,
-        "url": "\(url)"
+        "url": "\(url)",
+        "hash": hash
     ]) { err in
         if let err = err {
             print("Error writing document: \(err)")
