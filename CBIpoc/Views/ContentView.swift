@@ -155,9 +155,9 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
                 return completion(true,"Download URL is nil!")
             }
             print("Image uploaded successfully with url: \(String(describing: url))").self
-            let hash = image.blurHash(numberOfComponents: (3,5))
+            let hash = image.blurHash(numberOfComponents: (1,3))
             print("Image Hash is \(hash)")
-            
+//            completion(true, "Document uploaded successfully")
             uploadDoc(url: downloadURL, filename: filename, userUID: userUID, hash: hash!,downloadURL: downloadURL) { success, message in
                 return completion(success, message)
             }
