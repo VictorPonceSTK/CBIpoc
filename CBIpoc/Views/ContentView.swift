@@ -131,6 +131,9 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
         return
     }
     
+    let width = image.size.width
+    let height = image.size.height
+    
     // Generate a unique filename for the image
     let filename = UUID().uuidString + ".jpg"
     // Create a reference to the Firebase Storage location where the image will be uploaded
@@ -155,22 +158,22 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
                 return completion(true,"Download URL is nil!")
             }
             print("Image uploaded successfully with url: \(String(describing: url))").self
-            let hash = image.blurHash(numberOfComponents: (1,3))
-            print("Image Hash is \(hash)")
-//            completion(true, "Document uploaded successfully")
-            uploadDoc(url: downloadURL, filename: filename, userUID: userUID, hash: hash!,downloadURL: downloadURL) { success, message in
+            //            completion(true, "Document uploaded successfully")
+            uploadDoc(url: downloadURL, filename: filename, userUID: userUID,
+                      downloadURL: downloadURL, height:Int(height),width: Int(width)) { success, message in
                 return completion(success, message)
             }
         }
     }
 }
 
-func uploadDoc(url: URL, filename: String, userUID: String,hash: String, downloadURL:URL, completion: @escaping (Bool, String) -> Void) {
+func uploadDoc(url: URL, filename: String, userUID: String, downloadURL:URL, height:Int, width:Int,  completion: @escaping (Bool, String) -> Void) {
     let body = [
         "added_time": FieldValue.serverTimestamp(),
         "name": filename,
         "url": "\(url)",
-        "hash": hash
+        "height": height,
+        "width" : width
     ] as [String : Any]
     
     
