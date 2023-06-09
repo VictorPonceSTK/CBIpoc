@@ -168,34 +168,43 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
 }
 
 func uploadDoc(url: URL, filename: String, userUID: String, downloadURL:URL, height:Int, width:Int,  completion: @escaping (Bool, String) -> Void) {
+
+    let userImageSize: [String: Any] = [
+        "width": width,
+        "height": height
+
+    ]
     let body = [
-        "added_time": FieldValue.serverTimestamp(),
-        "name": filename,
-        "url": "\(url)",
-        "height": height,
-        "width" : width
-    ] as [String : Any]
-    
-    
-    print("debug body: \(body)")
-    let ref = db.collection("users").document(userUID).collection("images").document()
-    db.collection("users").document(userUID).collection("images").document(ref.documentID).setData(body) {  err in
-        if let err = err {
-            print("Error writing document: \(err)")
-            completion(false, "Failed to upload document: \(err.localizedDescription)")
-        } else {
-            let apiBody = [
-                "url":"\(url)",
-                "user_id": userUID,
-                "document_id": ref.documentID
-            ] as [String: Any]
-            print("sending to api", apiBody)
-            completion(true, "Document uploaded successfully")
-            sendToAnalyse(inUrl:downloadURL, body:apiBody)
-            sendToPredict(inUrl:downloadURL, body:apiBody)
-            print("Document successfully written!")
+            "added_time": FieldValue.serverTimestamp(),
+            "name": filename,
+            "url": "\(url)",
+            "size": userImageSize
             
-            
+        ] as [String : Any]
+        
+        
+        print("debug body: \(body)")
+        let ref = db.collection("users").document(userUID).collection("images").document()
+        db.collection("users").document(userUID).collection("images").document(ref.documentID).setData(body) {  err in
+            if let err = err {
+                print("Error writing document: \(err)")
+                completion(false, "Failed to upload document: \(err.localizedDescription)")
+            } else {
+                let apiBody = [
+                    "url":"\(url)",
+                    "user_id": userUID,
+                    "document_id": ref.documentID
+                ] as [String: Any]
+                print("sending to api", apiBody)
+                completion(true, "Document uploaded successfully")
+                sendToAnalyse(inUrl:downloadURL, body:apiBody)
+                sendToPredict(inUrl:downloadURL, body:apiBody)
+                print("Document successfully written!")
+                
+                
+            }
         }
-    }
+    
+    
+    
 }
