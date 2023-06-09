@@ -37,9 +37,9 @@ struct HomeView: View {
                             .frame(width: 300, height: 150)
                             .background(
                                 LinearGradient(
-                                    gradient: Gradient(colors: [Color.blue.opacity(0.4), Color.blue]),
-                                    startPoint: .leading,
-                                    endPoint: .bottom
+                                    gradient: Gradient(colors: [Color.blue.opacity(0.5), Color.blue]),
+                                    startPoint: .topTrailing,
+                                    endPoint: .bottomLeading
                                 )
                             )
                             .cornerRadius(30)
