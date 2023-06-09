@@ -8,11 +8,10 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var isButtonClicked = false
-    
+    var userUID = ""
     var body: some View {
         VStack {
 
-            
             Image("innovationLogo")
                 .padding(.top,10)
             Text("Welcome")
@@ -48,7 +47,7 @@ struct HomeView: View {
             Spacer()
         }
         .sheet(isPresented: $isButtonClicked) {
-            ContentView()
+            ContentView(userUID: userUID)
         }
     }
 }
