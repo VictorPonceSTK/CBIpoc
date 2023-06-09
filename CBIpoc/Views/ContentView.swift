@@ -173,7 +173,8 @@ func uploadDoc(url: URL, filename: String, userUID: String, downloadURL:URL, hei
         "name": filename,
         "url": "\(url)",
         "height": height,
-        "width" : width
+        "width" : width,
+        "open": false
     ] as [String : Any]
     
     
