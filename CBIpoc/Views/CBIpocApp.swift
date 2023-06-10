@@ -16,15 +16,14 @@ struct CBIpocApp: App {
     init(){
         FirebaseApp.configure()
     }
-        
     var body: some Scene {
         WindowGroup {
             LoginView()
+                .environmentObject(User())
         }
     }
 }
 
-//
 //struct ContentView_Previews: PreviewProvider{
 //    static var previews: some view{
 //        CBIpocApp()

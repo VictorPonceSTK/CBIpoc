@@ -10,10 +10,11 @@ struct ContentView: View {
     @State private var isPhotoLibraryOpen = false
     @State private var selectedImage: UIImage?
     @State private var isCompleted = false
+    @State private var loader = false // brings bottom slider up
     @State private var messageStatus = ""
-    var userUID = ""
+    @EnvironmentObject var user: User
     
-    var body: some View {
+    var body: some View{
         VStack(spacing: 50) {
             Spacer()
             
@@ -37,8 +38,7 @@ struct ContentView: View {
                 .sheet(isPresented: $isCameraOpen) {
                     ImagePicker(sourceType: .camera) { image in
                         selectedImage = image
-                        uploadImage(image, userUID) { success, message in
-                            isCompleted = success
+                        uploadImage(image: image, userUID: user.UID, isDone: $loader, isCompleted: $isCompleted) { success, message in
                             messageStatus = message
                         }
                     }
@@ -62,7 +62,7 @@ struct ContentView: View {
                 .sheet(isPresented: $isPhotoLibraryOpen) {
                     ImagePicker(sourceType: .photoLibrary) { image in
                         selectedImage = image
-                        uploadImage(image, userUID) { success, message in
+                        uploadImage(image: image, userUID: user.UID, isDone: $loader, isCompleted: $isCompleted)  { success, message in
                             isCompleted = success
                             messageStatus = message
                         }
@@ -72,19 +72,51 @@ struct ContentView: View {
                 Text("From Library")
                     .font(.headline)
             }
-            
             Spacer()
-        }
-        .padding()
-        .alert(isPresented: $isCompleted) {
-            Alert(
-                title: Text("Status message"),
-                message: Text("Image has been uploaded successfully"),
-                dismissButton: .default(Text("Close"))
-            )
+        }.sheet(isPresented: $loader){
+            if !isCompleted {
+                NewGaleryOptionView() // Loading animation
+            }
+            else{
+                //victor.ponce@softtek.com
+                VStack(spacing: 30){
+                    HStack{
+                        Text("Upload another picture?")
+                    }
+                    HStack(spacing: 20){
+                        Button(action: { // This button will reset the view and will let the user pick to use the camera or gallery
+                            isCompleted = false
+                            loader = false
+                        }){
+                            Text("Yes")
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(width: 150)
+                                .background(Color.green)
+                                .cornerRadius(10)
+                        }
+                        
+                        Button(action: {
+                            user.isLoggedIn = false // Will send the user back to the login page
+                        }) {
+                            Text("No")
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(width: 150)
+                                .background(Color.red)
+                                .cornerRadius(10)
+                        }
+                    }
+                }
+            }
         }
     }
 }
+
+
+
 
 struct ImagePicker: UIViewControllerRepresentable {
     var sourceType: UIImagePickerController.SourceType
@@ -124,7 +156,9 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
 }
 
-func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Bool, String) -> Void) {
+func uploadImage( image: UIImage, userUID: String, isDone: Binding<Bool>,isCompleted: Binding<Bool> ,completion: @escaping (Bool, String) -> Void) {
+    isDone.wrappedValue = true
+    
     // Convert the UIImage to Data
     guard let imageData = image.jpegData(compressionQuality: 0.8) else {
         print("Failed to convert image to Data.")
@@ -139,7 +173,7 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
     // Create a reference to the Firebase Storage location where the image will be uploaded
     let storageRef = Storage.storage().reference().child(filename)
     // Upload the image data to Firebase Storage
-    let uploadTask = storageRef.putData(imageData, metadata: nil) { (metadata, error) in
+    storageRef.putData(imageData, metadata: nil) { (metadata, error) in
         if let error = error {
             print("Error uploading image: \(error.localizedDescription)")
             
@@ -160,14 +194,15 @@ func uploadImage(_ image: UIImage, _ userUID: String, completion: @escaping (Boo
             print("Image uploaded successfully with url: \(String(describing: url))").self
             //            completion(true, "Document uploaded successfully")
             uploadDoc(url: downloadURL, filename: filename, userUID: userUID,
-                      downloadURL: downloadURL, height:Int(height),width: Int(width)) { success, message in
+                      downloadURL: downloadURL, height:Int(height),width: Int(width), isCompleted:isCompleted) { success, message in
                 return completion(success, message)
             }
         }
     }
 }
 
-func uploadDoc(url: URL, filename: String, userUID: String, downloadURL:URL, height:Int, width:Int,  completion: @escaping (Bool, String) -> Void) {
+func uploadDoc(url: URL, filename: String, userUID: String, downloadURL:URL, height:Int, width:Int, isCompleted:Binding <Bool>, completion: @escaping (Bool, String) -> Void) {
+    //make this array into an object to make code cleaner
     let body = [
         "added_time": FieldValue.serverTimestamp(),
         "name": filename,
@@ -177,8 +212,6 @@ func uploadDoc(url: URL, filename: String, userUID: String, downloadURL:URL, hei
         "open": false
     ] as [String : Any]
     
-    
-    print("debug body: \(body)")
     let ref = db.collection("users").document(userUID).collection("images").document()
     db.collection("users").document(userUID).collection("images").document(ref.documentID).setData(body) {  err in
         if let err = err {
@@ -195,7 +228,7 @@ func uploadDoc(url: URL, filename: String, userUID: String, downloadURL:URL, hei
             sendToAnalyse(inUrl:downloadURL, body:apiBody)
             sendToPredict(inUrl:downloadURL, body:apiBody)
             print("Document successfully written!")
-            
+            isCompleted.wrappedValue = true
             
         }
     }

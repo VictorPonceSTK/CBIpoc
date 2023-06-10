@@ -8,7 +8,6 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var isButtonClicked = false
-    var userUID = ""
     var body: some View {
         VStack {
 
@@ -47,7 +46,7 @@ struct HomeView: View {
             Spacer()
         }
         .sheet(isPresented: $isButtonClicked) {
-            ContentView(userUID: userUID)
+            ContentView()
         }
     }
 }
