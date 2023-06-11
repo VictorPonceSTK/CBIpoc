@@ -28,6 +28,7 @@
 		57F34A8F2A2FB97A009AA08A /* sendToPredict.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F34A8E2A2FB97A009AA08A /* sendToPredict.swift */; };
 		57F34A932A34452B009AA08A /* NewGaleryOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F34A922A34452A009AA08A /* NewGaleryOptionView.swift */; };
 		57F34A952A34D9D0009AA08A /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F34A942A34D9D0009AA08A /* UserData.swift */; };
+		57F34A992A35464B009AA08A /* uploadToFirebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F34A982A35464B009AA08A /* uploadToFirebase.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		57F34A8E2A2FB97A009AA08A /* sendToPredict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sendToPredict.swift; sourceTree = "<group>"; };
 		57F34A922A34452A009AA08A /* NewGaleryOptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGaleryOptionView.swift; sourceTree = "<group>"; };
 		57F34A942A34D9D0009AA08A /* UserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
+		57F34A982A35464B009AA08A /* uploadToFirebase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = uploadToFirebase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +149,7 @@
 			children = (
 				57F34A8C2A2FB63B009AA08A /* sendToAnalyse.swift */,
 				57F34A8E2A2FB97A009AA08A /* sendToPredict.swift */,
+				57F34A982A35464B009AA08A /* uploadToFirebase.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -244,6 +247,7 @@
 				57F34A8D2A2FB63B009AA08A /* sendToAnalyse.swift in Sources */,
 				57F34A8A2A2FAEF5009AA08A /* BlurHashEncode.swift in Sources */,
 				57F34A952A34D9D0009AA08A /* UserData.swift in Sources */,
+				57F34A992A35464B009AA08A /* uploadToFirebase.swift in Sources */,
 				57F34A932A34452B009AA08A /* NewGaleryOptionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -1,12 +1,10 @@
 import SwiftUI
-//import Firebase
 import FirebaseCore
 import FirebaseFirestore
 import FirebaseAuth
 
 struct LoginView: View {
     @Environment(\.colorScheme) var colorScheme
-    
     @State private var email = ""
     @State private var password = ""
     @EnvironmentObject var user: User
@@ -79,11 +77,5 @@ struct LoginView: View {
                 completion(true)
             }
         }
-    }
-}
-
-struct LoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoginView()
     }
 }

@@ -12,7 +12,6 @@ import FirebaseCore
 @main
 struct CBIpocApp: App {
     // register app delegate for Firebase setup
-
     init(){
         FirebaseApp.configure()
     }
@@ -24,8 +23,3 @@ struct CBIpocApp: App {
     }
 }
 
-//struct ContentView_Previews: PreviewProvider{
-//    static var previews: some view{
-//        CBIpocApp()
-//    }
-//}

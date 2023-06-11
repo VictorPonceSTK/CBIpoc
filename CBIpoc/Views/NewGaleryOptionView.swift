@@ -12,7 +12,6 @@ struct NewGaleryOptionView: View {
     
     var body: some View {
         ZStack {
-            //victor.ponce@softtek.com
             Circle()
                 .stroke(Color(.systemGray5), lineWidth: 14)
                 .frame(width: 100, height: 100)
@@ -28,11 +27,5 @@ struct NewGaleryOptionView: View {
                     }
                 }
         }
-    }
-}
-
-struct NewGaleryOptionView_Previews: PreviewProvider {
-    static var previews: some View {
-        NewGaleryOptionView()
     }
 }
