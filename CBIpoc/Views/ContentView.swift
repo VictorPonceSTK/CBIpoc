@@ -13,7 +13,7 @@ struct ContentView: View {
     @State private var loader = false // brings bottom slider up
     @State private var messageStatus = ""
     @EnvironmentObject var user: User
-    
+    @Binding var isButtonClicked:Bool
     var body: some View{
         VStack(spacing: 50) {
             Spacer()
@@ -96,7 +96,7 @@ struct ContentView: View {
                         }
                         
                         Button(action: {
-                            user.isLoggedIn = false // Will send the user back to the login page
+                            isButtonClicked = false // Will send the user back to the login page
                         }) {
                             Text("No")
                                 .fontWeight(.bold)

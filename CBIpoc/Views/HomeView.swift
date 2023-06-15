@@ -23,8 +23,6 @@ struct HomeView: View {
                             isButtonClicked = true
                         }) {
                             HStack {
-                                Image(systemName: "plus.app")
-                                    .font(.title)
                                 Text("Upload")
                                     .font(.title)
                                     .fontWeight(.bold)
@@ -46,7 +44,7 @@ struct HomeView: View {
             Spacer()
         }
         .sheet(isPresented: $isButtonClicked) {
-            ContentView()
+            ContentView(isButtonClicked: $isButtonClicked) // Pass the binding variable
         }
     }
 }
