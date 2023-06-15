@@ -12,21 +12,14 @@ import FirebaseCore
 @main
 struct CBIpocApp: App {
     // register app delegate for Firebase setup
-
     init(){
         FirebaseApp.configure()
     }
-        
     var body: some Scene {
         WindowGroup {
             LoginView()
+                .environmentObject(User())
         }
     }
 }
 
-//
-//struct ContentView_Previews: PreviewProvider{
-//    static var previews: some view{
-//        CBIpocApp()
-//    }
-//}

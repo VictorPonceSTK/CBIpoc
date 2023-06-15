@@ -10,13 +10,13 @@ struct ContentView: View {
     @State private var isPhotoLibraryOpen = false
     @State private var selectedImage: UIImage?
     @State private var isCompleted = false
+    @State private var loader = false // brings bottom slider up
     @State private var messageStatus = ""
-    var userUID = ""
-    
-    var body: some View {
+    @EnvironmentObject var user: User
+    @Binding var isButtonClicked:Bool
+    var body: some View{
         VStack(spacing: 50) {
             Spacer()
-            
             VStack {
                 Button(action: {
                     if UIImagePickerController.isSourceTypeAvailable(.camera) {
@@ -37,8 +37,7 @@ struct ContentView: View {
                 .sheet(isPresented: $isCameraOpen) {
                     ImagePicker(sourceType: .camera) { image in
                         selectedImage = image
-                        uploadImage(image, userUID) { success, message in
-                            isCompleted = success
+                        uploadToFirebase(image: image, userUID: user.UID, isDone: $loader, isCompleted: $isCompleted) { success, message in
                             messageStatus = message
                         }
                     }
@@ -62,7 +61,7 @@ struct ContentView: View {
                 .sheet(isPresented: $isPhotoLibraryOpen) {
                     ImagePicker(sourceType: .photoLibrary) { image in
                         selectedImage = image
-                        uploadImage(image, userUID) { success, message in
+                        uploadToFirebase(image: image, userUID: user.UID, isDone: $loader, isCompleted: $isCompleted)  { success, message in
                             isCompleted = success
                             messageStatus = message
                         }
@@ -72,19 +71,49 @@ struct ContentView: View {
                 Text("From Library")
                     .font(.headline)
             }
-            
             Spacer()
-        }
-        .padding()
-        .alert(isPresented: $isCompleted) {
-            Alert(
-                title: Text("Status message"),
-                message: Text("Image has been uploaded successfully"),
-                dismissButton: .default(Text("Close"))
-            )
+        }.sheet(isPresented: $loader){
+            if !isCompleted {
+                NewGaleryOptionView() // Loading animation
+            }
+            else{
+                VStack(spacing: 30){
+                    HStack{
+                        Text("Upload another picture?")
+                    }
+                    HStack(spacing: 20){
+                        Button(action: { // This button will reset the view and will let the user pick to use the camera or gallery
+                            isCompleted = false
+                            loader = false
+                        }){
+                            Text("Yes")
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(width: 150)
+                                .background(Color.green)
+                                .cornerRadius(10)
+                        }
+                        
+                        Button(action: {
+                            isButtonClicked = false // Will send the user back to the login page
+                        }) {
+                            Text("No")
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(width: 150)
+                                .background(Color.red)
+                                .cornerRadius(10)
+                        }
+                    }
+                }
+            }
         }
     }
 }
+
+
 
 struct ImagePicker: UIViewControllerRepresentable {
     var sourceType: UIImagePickerController.SourceType

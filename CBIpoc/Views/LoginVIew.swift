@@ -1,20 +1,16 @@
 import SwiftUI
-//import Firebase
 import FirebaseCore
 import FirebaseFirestore
 import FirebaseAuth
 
 struct LoginView: View {
     @Environment(\.colorScheme) var colorScheme
-    
     @State private var email = ""
     @State private var password = ""
-    @State private var userIsLoggedIn = false
-    @State private var user = ""
-    
+    @EnvironmentObject var user: User
     var body: some View {
-        if userIsLoggedIn {
-            ContentView(userUID: user)
+        if user.isLoggedIn {
+            HomeView()
         } else {
             VStack(spacing:100) {
                 VStack {
@@ -47,8 +43,8 @@ struct LoginView: View {
                 Button(action: {
                     if !email.isEmpty && !password.isEmpty {
                         login(){ success in
-                            userIsLoggedIn = success
-                            user = Auth.auth().currentUser?.uid ?? ""
+                            user.isLoggedIn = success
+                            user.UID = Auth.auth().currentUser?.uid ?? ""
                         }
                         print("Login successful")
                     } else {
@@ -81,11 +77,5 @@ struct LoginView: View {
                 completion(true)
             }
         }
-    }
-}
-
-struct LoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoginView()
     }
 }
