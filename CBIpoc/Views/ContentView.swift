@@ -79,6 +79,11 @@ struct ContentView: View {
             else{
                 VStack(spacing: 30){
                     HStack{
+                        Text("Upload was successful")
+                            .font(.system(size: 25))
+                            .foregroundColor(.green)
+                    }
+                    HStack{
                         Text("Upload another picture?")
                     }
                     HStack(spacing: 20){
