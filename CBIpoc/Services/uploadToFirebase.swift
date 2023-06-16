@@ -67,7 +67,7 @@ func uploadDoc(url: URL, filename: String, userUID: String, downloadURL:URL, hei
         "name": filename,
         "url": "\(url)",
         "size": userImageSize,
-        "open": false
+        "seen": false
     ] as [String : Any]
     
     let ref = db.collection("users").document(userUID).collection("images").document()
