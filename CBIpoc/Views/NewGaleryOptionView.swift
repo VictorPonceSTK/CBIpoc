@@ -4,6 +4,9 @@
 //
 //  Created by Victor Ponce on 09/06/23.
 //
+//  This view geneartes the loading animation that you see
+//  after uploading a picture to the backend
+
 
 import SwiftUI
 

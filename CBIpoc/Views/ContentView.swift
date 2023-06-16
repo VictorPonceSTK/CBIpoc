@@ -74,18 +74,20 @@ struct ContentView: View {
             Spacer()
         }.sheet(isPresented: $loader){
             if !isCompleted {
-                NewGaleryOptionView() // Loading animation
+                NewGaleryOptionView() // loading animation
             }
             else{
                 VStack(spacing: 30){
-                    HStack{
+                    
+                    VStack{
                         Text("Upload was successful")
                             .font(.system(size: 25))
                             .foregroundColor(.green)
                     }
-                    HStack{
+                    VStack{
                         Text("Upload another picture?")
                     }
+                    
                     HStack(spacing: 20){
                         Button(action: { // This button will reset the view and will let the user pick to use the camera or gallery
                             isCompleted = false
@@ -101,7 +103,7 @@ struct ContentView: View {
                         }
                         
                         Button(action: {
-                            isButtonClicked = false // Will send the user back to the login page
+                            isButtonClicked = false // Will send the user back to the home page
                         }) {
                             Text("No")
                                 .fontWeight(.bold)
@@ -113,7 +115,15 @@ struct ContentView: View {
                         }
                     }
                 }
+                .onDisappear{
+                    isCompleted = false
+                    loader = false
+                    print("inside the on dissaper")
+                    print("is completed: \(isCompleted)")
+                    print("loader: \(loader)")
+                }
             }
+            
         }
     }
 }

@@ -33,7 +33,7 @@ func sendToPredict(inUrl:URL, body: [String: Any]){
         // Handle the response data
         if let data = data {
             if let responseString = String(data: data, encoding: .utf8) {
-                print("Response: \(responseString)")
+                print("Response: data was successfull")
             }
         }
     }
