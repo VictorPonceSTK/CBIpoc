@@ -47,7 +47,6 @@ func uploadToFirebase( image: UIImage, userUID: String, isDone: Binding<Bool>,is
                 return completion(true,"Download URL is nil!")
             }
             print("Image uploaded successfully with url: \(String(describing: url))").self
-            //            completion(true, "Document uploaded successfully")
             uploadDoc(url: downloadURL, filename: filename, userUID: userUID,
                       downloadURL: downloadURL, height:Int(height),width: Int(width), isCompleted:isCompleted) { success, message in
                 return completion(success, message)
@@ -58,12 +57,16 @@ func uploadToFirebase( image: UIImage, userUID: String, isDone: Binding<Bool>,is
 
 func uploadDoc(url: URL, filename: String, userUID: String, downloadURL:URL, height:Int, width:Int, isCompleted:Binding <Bool>, completion: @escaping (Bool, String) -> Void) {
     //make this array into an object to make code cleaner
+    let userImageSize: [String: Any] = [
+        "width": width,
+        "height": height
+        
+    ]
     let body = [
         "added_time": FieldValue.serverTimestamp(),
         "name": filename,
         "url": "\(url)",
-        "height": height,
-        "width" : width,
+        "size": userImageSize,
         "open": false
     ] as [String : Any]
     
