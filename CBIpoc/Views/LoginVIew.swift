@@ -5,7 +5,7 @@ import FirebaseAuth
 
 struct LoginView: View {
     @Environment(\.colorScheme) var colorScheme
-    @State private var email = ""
+    @State private var email = "victor.ponce@softtek.com"
     @State private var password = ""
     @EnvironmentObject var user: User
     var body: some View {
